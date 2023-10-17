@@ -1,0 +1,1 @@
+widget not used - old vanillajs version, thats only support metamask
