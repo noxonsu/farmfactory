@@ -118,26 +118,34 @@ library SafeMath {
     }
 }
 ```
-# костыли на стороне фронтенда
-см farm.swaponline.io
-```
-Contract with bank (to distribute accross users): <span id='stakingCtr'>(loading)</span> <br> 
 
-Current bank: <span id='curbalance'>(loading)</span> BSC <br>
+2. выполнить transfer_old ( адрес фермы, 100000000000000000000 )
+3. запустить ферму
+4. кинуть чутка свапов на ферму и bnb на задеплоеный persent  
+5. Reward Amount 100 . 
+6. 
+# костыли на стороне фронтенда
+см farm.onout.org 
+```
+Contract with bank (to distribute across users): <span id="stakingCtr">(loading)</span> <br> 
+
+Current bank: <span id="curbalance">(loading)</span> BNB<br>
 <br>
-Farm contract: <span id='farmCtr'>loading</span>
+Farm contract: <span id="farmCtr">loading</span>
 
 
 <script>var myshare,x;
+var rewardsAddress = '0x2b5e5d1f126b6f47537a62f9541cb364b66ddbd3';
+var  farmAddress = '0xd84A17ACb716873fE0DaA95c5c13a46BfdC7df06'
 	function calcstat() { 
 var curbalance;
-		document.querySelector("#stakingCtr").innerHTML = '<a href="https://bscscan.com/search?f=0&q='+widget8.opts.rewardsAddress+'" target=_blank>'+widget8.opts.rewardsAddress+'</a>';curbalance
-		document.querySelector("#farmCtr").innerHTML = '<a href="https://bscscan.com/search?f=0&q='+widget8.opts.farmAddress+'" target=_blank>'+widget8.opts.farmAddress+'</a>';
+		document.querySelector("#stakingCtr").innerHTML = '<a href="https://bscscan.com/address/'+rewardsAddress+'#internaltx" target=_blank>'+rewardsAddress+'</a>';curbalance
+		document.querySelector("#farmCtr").innerHTML = '<a href="https://bscscan.com/search?f=0&q='+farmAddress+'" target=_blank>'+farmAddress+'</a>';
 var opts = {
 method: 'GET',
 headers: {}
 };
-fetch('https://api.bscscan.com/api?module=account&action=balance&address='+widget8.opts.rewardsAddress+'&tag=latest&apikey=GGGHTAFK7QKE7N335QW1SGIH9X1PXFFIWH', opts).then(function (response) {
+fetch('https://api.bscscan.com/api?module=account&action=balance&address='+rewardsAddress+'&tag=latest&apikey=GGGHTAFK7QKE7N335QW1SGIH9X1PXFFIWH', opts).then(function (response) {
 return response.json();
 })
 .then(function (body) {
@@ -153,18 +161,20 @@ x = 1;
  myshare = document.querySelector(".ff-widget-earned-amount").innerHTML; 
 			
 												 document.querySelector(".ff-widget-apy").innerHTML = myshare+"%"; 
-												 document.querySelector(".ff-widget-earned-amount").innerHTML = (curbalance/100*myshare)/1000000000000000000 + " BSC"; 
+												 document.querySelector(".ff-widget-earned-amount").innerHTML = (curbalance/100*myshare)/1000000000000000000 + " BNB"; 
 
 	
 });
 		
-document.querySelector(".ff-widget-title").innerHTML="SWAP-BSC"
-document.querySelector(".ff-widget-earn-token-name").innerHTML="BSC"
-document.querySelector(".ff-widget-section-title").innerHTML="BSC Earned"
+document.querySelector(".ff-widget-title").innerHTML="SWAP-BNB"
+document.querySelector(".ff-widget-earn-token-name").innerHTML="BNB"
+document.querySelector(".ff-widget-section-title").innerHTML="BNB Earned"
 
 		
 	}
 	
 	
-setInterval(calcstat,3000) 
+setInterval(calcstat,3000)
+
+</script>
 	```
