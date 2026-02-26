@@ -8,7 +8,7 @@
 /**
  * Init
  */
-require FARMFACTORY_PATH . 'App/autoload.php';
+require FARMFACTORY_BASE_DIR . '/App/autoload.php';
 
 /**
  * Functions
