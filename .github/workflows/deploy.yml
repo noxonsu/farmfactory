@@ -1,48 +1,168 @@
-name: Build and Deploy FarmFactory
+name: Deploy FarmFactory
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
+      - master
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Generate version
+        id: version
+        run: |
+          VERSION=$(date -u +%Y%m%d%H%M)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Generated version: $VERSION"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: npm run build
 
-      - name: Update version
+      - name: Verify build output
         run: |
-          VERSION=$(date +%Y%m%d%H%M)
-          sed -i "s/Version: .*/Version: 2.5.$VERSION/" farmfactory.php
-          sed -i "s/define( 'FARMFACTORY_VER', '.*')/define( 'FARMFACTORY_VER', '2.5.$VERSION')/" farmfactory.php
+          if [ ! -d "lib" ]; then
+            echo "Error: lib directory not found"
+            exit 1
+          fi
+          if [ -z "$(ls -A lib)" ]; then
+            echo "Error: lib directory is empty"
+            exit 1
+          fi
+          echo "Build output verified"
 
-      - name: Commit build artifacts
+      - name: Create info.json
         run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add lib/ farmfactory.php
-          git commit -m "Auto-build: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes"
-          git push
+          cat > info.json << EOF
+          {
+            "version": "${{ env.VERSION }}",
+            "timestamp": $(date +%s),
+            "download_url": "https://farm.wpmix.net/updates/farmfactory-v${{ env.VERSION }}.zip",
+            "changelog": "${{ github.event.head_commit.message }}",
+            "requires": "5.0",
+            "tested": "6.4",
+            "package": "https://farm.wpmix.net/updates/farmfactory-v${{ env.VERSION }}.zip"
+          }
+          EOF
+          cat info.json
 
-      - name: Deploy to WordPress server
-        env:
-          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: Create WordPress plugin package
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 95.217.227.162 >> ~/.ssh/known_hosts
-          ssh root@95.217.227.162 "cd /home/farmFactory/web/farm.wpmix.net/public_html/farmfactory/ && git pull origin main || git pull origin master"
+          # Create temporary directory for packaging
+          mkdir -p farmfactory-package
+
+          # Copy build output
+          cp -r lib farmfactory-package/
+
+          # Copy plugin files
+          cp info.json farmfactory-package/
+          if [ -f "readme.txt" ]; then
+            cp readme.txt farmfactory-package/
+          fi
+          if [ -f "farmfactory.php" ]; then
+            cp farmfactory.php farmfactory-package/
+          fi
+
+          # Create ZIP
+          cd farmfactory-package
+          zip -r ../farmfactory-v${{ env.VERSION }}.zip .
+          cd ..
+
+          # Verify ZIP
+          if [ ! -f "farmfactory-v${{ env.VERSION }}.zip" ]; then
+            echo "Error: ZIP file not created"
+            exit 1
+          fi
+
+          echo "Package created: farmfactory-v${{ env.VERSION }}.zip"
+          ls -lh farmfactory-v${{ env.VERSION }}.zip
+
+      - name: Upload to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "farmfactory-v${{ env.VERSION }}.zip,info.json"
+          target: "/home/farmFactory/incoming/"
+
+      - name: Update info.json on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p /var/www/html/farmfactory
+            cp /home/farmFactory/incoming/info.json /var/www/html/farmfactory/info.json
+            chmod 644 /var/www/html/farmfactory/info.json
+            echo "info.json updated"
+            cat /var/www/html/farmfactory/info.json
+
+      - name: Deploy static demo (if exists)
+        uses: appleboy/ssh-action@master
+        continue-on-error: true
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            if [ -d "/home/farmFactory/incoming/demo" ]; then
+              mkdir -p /var/www/html/farmfactory-demo
+              cp -r /home/farmFactory/incoming/demo/* /var/www/html/farmfactory-demo/
+              echo "Demo files deployed"
+            else
+              echo "No demo files to deploy"
+            fi
+
+      - name: Health check
+        run: |
+          echo "Waiting 10 seconds for deployment to settle..."
+          sleep 10
+
+          # Check if info.json is accessible
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://farm.wpmix.net/farmfactory/info.json || echo "000")
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✓ Health check passed (HTTP $HTTP_CODE)"
+          else
+            echo "⚠ Warning: Health check returned HTTP $HTTP_CODE (non-blocking)"
+          fi
+
+      - name: Notify completion
+        if: success()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✓ FarmFactory deployment complete"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Version: ${{ env.VERSION }}"
+          echo "Package: farmfactory-v${{ env.VERSION }}.zip"
+          echo "Download: https://farm.wpmix.net/updates/farmfactory-v${{ env.VERSION }}.zip"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✗ FarmFactory deployment failed"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Version: ${{ env.VERSION }}"
+          echo "Check workflow logs for details"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
