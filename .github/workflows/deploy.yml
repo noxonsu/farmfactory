@@ -1,0 +1,48 @@
+name: Build and Deploy FarmFactory
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Update version
+        run: |
+          VERSION=$(date +%Y%m%d%H%M)
+          sed -i "s/Version: .*/Version: 2.5.$VERSION/" farmfactory.php
+          sed -i "s/define( 'FARMFACTORY_VER', '.*')/define( 'FARMFACTORY_VER', '2.5.$VERSION')/" farmfactory.php
+
+      - name: Commit build artifacts
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add lib/ farmfactory.php
+          git commit -m "Auto-build: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes"
+          git push
+
+      - name: Deploy to WordPress server
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 95.217.227.162 >> ~/.ssh/known_hosts
+          ssh root@95.217.227.162 "cd /home/farmFactory/web/farm.wpmix.net/public_html/farmfactory/ && git pull origin main || git pull origin master"
