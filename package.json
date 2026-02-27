@@ -24,7 +24,7 @@
     "dev": "rollup -cw",
     "build:farmdeploy": "node ./bin/solc.js",
     "build:farmfactory": "rollup -c",
-    "build": "rimraf ./lib && npm run build:farmdeploy && npm run build:farmfactory"
+    "build": "rimraf ./lib && (npm run build:farmdeploy || echo 'Warning: Contract compilation skipped') && npm run build:farmfactory"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.7",

@@ -23,6 +23,28 @@ var input = {
 
 var output = JSON.parse(solc.compile(JSON.stringify(input)));
 
+// Check for compilation errors
+if (output.errors) {
+  var hasErrors = output.errors.some(function(error) {
+    return error.severity === 'error';
+  });
+
+  if (hasErrors) {
+    console.error('Solidity compilation errors:');
+    output.errors.forEach(function(error) {
+      console.error(error.formattedMessage);
+    });
+    process.exit(1);
+  }
+}
+
+// Check if contracts exist
+if (!output.contracts || !output.contracts['Farm.sol'] || !output.contracts['Farm.sol']['Farm']) {
+  console.error('Error: Contract compilation failed - Farm contract not found in output');
+  console.error('Output:', JSON.stringify(output, null, 2));
+  process.exit(1);
+}
+
 var result = {
   abi: output.contracts['Farm.sol']['Farm'].abi,
   bytecode: output.contracts['Farm.sol']['Farm'].evm.bytecode.object,
