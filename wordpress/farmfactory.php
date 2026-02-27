@@ -12,7 +12,7 @@ Version: 2.26.0227
 /* Define Plugin Constants */
 defined( 'ABSPATH' ) || exit;
 define( 'FARMFACTORY_TEMPLATE_DIR', __DIR__ . '/templates' );
-define( 'FARMFACTORY_BASE_DIR', dirname( __DIR__ ) );
+define( 'FARMFACTORY_BASE_DIR', __DIR__ );
 define( 'FARMFACTORY_BASE_FILE', __FILE__ );
 define( 'FARMFACTORY_PATH', __DIR__ . '/' );
 define( 'FARMFACTORY_URL', plugin_dir_url( __FILE__ ) );
