@@ -41,7 +41,14 @@ if (output.errors) {
 // Check if contracts exist
 if (!output.contracts || !output.contracts['Farm.sol'] || !output.contracts['Farm.sol']['Farm']) {
   console.error('Error: Contract compilation failed - Farm contract not found in output');
-  console.error('Output:', JSON.stringify(output, null, 2));
+  console.error('Creating stub Farm.json for development...');
+
+  // Create stub file to allow build to continue
+  var stub = {
+    abi: [],
+    bytecode: '0x'
+  };
+  fs.writeFileSync(path.resolve('contracts/Farm.json'), JSON.stringify(stub));
   process.exit(1);
 }
 
