@@ -29,6 +29,17 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Generated version: $VERSION"
 
+      - name: Update version in plugin files
+        run: |
+          # Update plugin header version
+          sed -i "s/^ \* Version: .*/ * Version: ${{ env.VERSION }}/" wordpress/farmfactory.php
+
+          # Update version constant
+          sed -i "s/define( 'FARMFACTORY_VER', '.*'/define( 'FARMFACTORY_VER', '${{ env.VERSION }}'/" wordpress/farmfactory.php
+
+          echo "Updated wordpress/farmfactory.php:"
+          grep -E "Version:|FARMFACTORY_VER" wordpress/farmfactory.php
+
       - name: Install dependencies
         run: npm install
 
