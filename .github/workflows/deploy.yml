@@ -143,10 +143,10 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            mkdir -p /var/www/html/farmfactory
-            cp /home/farmFactory/incoming/info.json /var/www/html/farmfactory/info.json
-            chmod 644 /var/www/html/farmfactory/info.json
-            echo "info.json updated"
+            mkdir -p /home/farmFactory/web/farm.wpmix.net/public_html/updates
+            cp /home/farmFactory/incoming/info.json /home/farmFactory/web/farm.wpmix.net/public_html/updates/farmfactory-info.json
+            chmod 644 /home/farmFactory/web/farm.wpmix.net/public_html/updates/farmfactory-info.json
+            echo "info.json updated as farmfactory-info.json"
             cat /var/www/html/farmfactory/info.json
 
       - name: Deploy WordPress plugin ZIP to updates directory
