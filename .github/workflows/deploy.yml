@@ -64,24 +64,44 @@ jobs:
 
       - name: Create WordPress plugin package
         run: |
-          # Create temporary directory for packaging
-          mkdir -p farmfactory-package
+          echo "Creating WordPress plugin package..."
 
-          # Copy build output
-          cp -r lib farmfactory-package/
+          # Create package directory with plugin subdirectory (WordPress standard)
+          mkdir -p farmfactory-package/farmfactory
 
-          # Copy plugin files
-          cp info.json farmfactory-package/
-          if [ -f "readme.txt" ]; then
-            cp readme.txt farmfactory-package/
+          # Copy all WordPress plugin files from wordpress/ directory
+          echo "Copying WordPress plugin files..."
+          cp -r wordpress/* farmfactory-package/farmfactory/
+
+          # Copy App directory (controllers)
+          echo "Copying App directory..."
+          cp -r App farmfactory-package/farmfactory/
+
+          # Copy lang directory (translations)
+          if [ -d "lang" ]; then
+            echo "Copying lang directory..."
+            cp -r lang farmfactory-package/farmfactory/
           fi
-          if [ -f "farmfactory.php" ]; then
-            cp farmfactory.php farmfactory-package/
+
+          # Overwrite lib with fresh build output
+          echo "Copying build output to lib..."
+          cp -r lib/* farmfactory-package/farmfactory/lib/
+
+          # Copy additional files
+          if [ -f "README.md" ]; then
+            cp README.md farmfactory-package/farmfactory/
+          fi
+          if [ -f "LICENCE" ]; then
+            cp LICENCE farmfactory-package/farmfactory/
           fi
 
-          # Create ZIP
+          # Verify structure
+          echo "Package structure:"
+          ls -la farmfactory-package/farmfactory/
+
+          # Create ZIP (from package directory, so farmfactory/ is the root in ZIP)
           cd farmfactory-package
-          zip -r ../farmfactory-v${{ env.VERSION }}.zip .
+          zip -r ../farmfactory-v${{ env.VERSION }}.zip farmfactory
           cd ..
 
           # Verify ZIP
@@ -92,6 +112,8 @@ jobs:
 
           echo "Package created: farmfactory-v${{ env.VERSION }}.zip"
           ls -lh farmfactory-v${{ env.VERSION }}.zip
+          echo "ZIP contents:"
+          unzip -l farmfactory-v${{ env.VERSION }}.zip | head -30
 
       - name: Upload to server
         uses: appleboy/scp-action@master
@@ -114,6 +136,26 @@ jobs:
             chmod 644 /var/www/html/farmfactory/info.json
             echo "info.json updated"
             cat /var/www/html/farmfactory/info.json
+
+      - name: Deploy WordPress plugin ZIP to updates directory
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Create updates directory if it doesn't exist
+            mkdir -p /home/farmFactory/web/farm.wpmix.net/public_html/updates
+
+            # Move ZIP file from incoming to updates
+            mv /home/farmFactory/incoming/farmfactory-v${{ env.VERSION }}.zip \
+               /home/farmFactory/web/farm.wpmix.net/public_html/updates/
+
+            # Set permissions
+            chmod 644 /home/farmFactory/web/farm.wpmix.net/public_html/updates/farmfactory-v${{ env.VERSION }}.zip
+
+            echo "WordPress plugin package deployed:"
+            ls -lh /home/farmFactory/web/farm.wpmix.net/public_html/updates/farmfactory-v${{ env.VERSION }}.zip
 
       - name: Deploy static demo (if exists)
         uses: appleboy/ssh-action@master
