@@ -1,4 +1,6 @@
 # farmfactory
+
+[![Deploy Status](https://github.com/noxonsu/farmfactory/actions/workflows/deploy.yml/badge.svg)](https://github.com/noxonsu/farmfactory/actions/workflows/deploy.yml)
 https://farm.wpmix.net/ - demo
 https://www.youtube.com/watch?v=HdM1_XxN3VQ - video instruction
 https://t.me/onoutsupportbot/?start=github_ff - Contact our team using if you have any questions 
