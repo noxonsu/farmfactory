@@ -49,18 +49,30 @@ jobs:
 
       - name: Create info.json
         run: |
+          # Escape commit message for JSON
+          COMMIT_MSG=$(echo '${{ github.event.head_commit.message }}' | jq -Rs .)
+
           cat > info.json << EOF
           {
+            "name": "Farm Factory",
             "version": "${{ env.VERSION }}",
-            "timestamp": $(date +%s),
-            "download_url": "https://farm.wpmix.net/updates/farmfactory-v${{ env.VERSION }}.zip",
-            "changelog": "${{ github.event.head_commit.message }}",
-            "requires": "5.0",
             "tested": "6.4",
-            "package": "https://farm.wpmix.net/updates/farmfactory-v${{ env.VERSION }}.zip"
+            "requires": "5.0",
+            "requires_php": "7.1",
+            "download_url": "https://farm.wpmix.net/updates/farmfactory-v${{ env.VERSION }}.zip",
+            "last_updated": "$(date -u +"%Y-%m-%d %H:%M:%S")",
+            "sections": {
+              "description": "Stake farming contract - allows users to stake tokens and earn rewards on Ethereum, BSC, and Polygon networks",
+              "installation": "Upload the plugin files to /wp-content/plugins/farmfactory/, then activate the plugin through the Plugins menu in WordPress",
+              "changelog": "<h4>${{ env.VERSION }}</h4><ul><li>$(echo '${{ github.event.head_commit.message }}' | head -1)</li></ul>"
+            }
           }
           EOF
-          cat info.json
+
+          echo "Generated info.json:"
+          cat info.json | jq .
+          echo "Validating JSON..."
+          cat info.json | jq . > /dev/null && echo "✓ Valid JSON" || (echo "✗ Invalid JSON" && exit 1)
 
       - name: Create WordPress plugin package
         run: |
