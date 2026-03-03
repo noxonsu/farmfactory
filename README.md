@@ -30,3 +30,21 @@ Contact our team using https://t.me/onoutsupportbot/?start=github_ff if you have
 
 Icons made by <a href="https://www.flaticon.com/authors/flat-icons" title="Flat Icons">Flat Icons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
 
+
+---
+
+## Ecosystem
+
+This project is part of the [onout.org](https://onout.org) open-source DeFi toolkit:
+
+| Product | Description |
+|---------|-------------|
+| [Wallet](https://onout.org/wallet/) | Multi-currency crypto wallet + P2P swap |
+| [DEX](https://onout.org/dex/) | Create your own DEX like Uniswap / PancakeSwap |
+| **[Farming](https://onout.org/farming/)** | ← this project — ERC20 staking & yield farming |
+| [CrossChain](https://onout.org/crosschain/) | Cross-chain bridge |
+| [DAO Widget](https://onout.org/dao/) | Create your own DAO (Snapshot fork) |
+| [NFTsy](https://onout.org/nft/) | NFT showcase plugin |
+| [PredictionMarket](https://onout.org/predictionmarket/) | Prediction market platform |
+| [Launchpad](https://onout.org/launchpad/) | IDO Launchpad |
+| [Lottery](https://onout.org/lottery/) | Crypto lottery |
