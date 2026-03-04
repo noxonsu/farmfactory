@@ -108,6 +108,10 @@ jobs:
           echo "Copying WordPress plugin files..."
           cp -r wordpress/* farmfactory-package/farmfactory/
 
+          # Copy reactwidget (React bundle - built separately in src_react/)
+          echo "Copying reactwidget..."
+          cp -r reactwidget farmfactory-package/farmfactory/reactwidget
+
           # Copy App directory (controllers)
           echo "Copying App directory..."
           cp -r App farmfactory-package/farmfactory/
