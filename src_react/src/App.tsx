@@ -1,26 +1,19 @@
-import { wagmiConfig } from './utils/wagmiConfig'
-import { WagmiConfig } from 'wagmi'
-import {
-  RainbowKitProvider,
-  darkTheme,
-  lightTheme,
-  midnightTheme,
-} from '@rainbow-me/rainbowkit'
-
-import { chains } from './utils/chains'
-import '@rainbow-me/rainbowkit/styles.css';
+import './appkit'
+import { wagmiConfig } from './appkit'
+import { WagmiProvider } from 'wagmi'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Widget from './Widget'
+
+const queryClient = new QueryClient()
 
 function App(props: any) {
   const { widgetOptions } = props
   return (
-    <>
-      <WagmiConfig config={wagmiConfig}>
-        <RainbowKitProvider chains={chains} theme={(widgetOptions.theme=='dark') ? darkTheme() : lightTheme()}>
-          <Widget widgetOptions={widgetOptions} />
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <Widget widgetOptions={widgetOptions} />
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { configureChains } from 'wagmi';
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
+// chains.ts — network definitions for FarmFactory
+// wagmi v2 / viem: configureChains removed; chain info used via NETWORKS directly
 
 const FARM_CHAIN = window.SO_FARM_FACTORY_NETWORK
 
@@ -50,7 +50,7 @@ const NETWORKS = {
     explorer: "https://testnet.bscscan.com",
   },
   matic: {
-    chainId: 97,
+    chainId: 137,
     name: "Polygon",
     nativeCurrency: {
       name: "MATIC",
@@ -94,7 +94,7 @@ const NETWORKS = {
     explorer: "https://amescan.io/",
   },
   avax: {
-    chainId: 180,
+    chainId: 43114,
     name: "Avalanche",
     nativeCurrency: {
       name: "AVAX",
@@ -194,27 +194,6 @@ const NETWORKS = {
   },
 }
 
-const GET_CHAIN = (chainName) => {
-  return {
-    id: NETWORKS[chainName].chainId,
-    network: chainName,
-    name: NETWORKS[chainName].name,
-    nativeCurrency: NETWORKS[chainName].nativeCurrency,
-    rpcUrls: {
-      default: {
-        http: [
-          NETWORKS[chainName].rpc
-        ]
-      },
-      public: {
-        http: [
-          NETWORKS[chainName].rpc
-        ]
-      }
-    },
-  }
-}
-
 export const GET_RPC = (chainName) => {
   return NETWORKS[chainName].rpc
 }
@@ -222,23 +201,3 @@ export const GET_RPC = (chainName) => {
 export const GET_TX_LINK = (hash) => {
   return NETWORKS[FARM_CHAIN].explorer + '/tx/' + hash
 }
-
-const netInfo = GET_CHAIN(FARM_CHAIN)
-
-const getChainRPC = (chainId) => {
-  const chainData = Object.keys(NETWORKS).filter((chainName) => {
-    return `${NETWORKS[chainName].chainId}` == `${chainId}`
-  })
-  if (chainData.length) return NETWORKS[chainData[0]].rpc
-}
-
-export const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [ netInfo ],
-  [
-    jsonRpcProvider({
-      rpc: (chain) => ({
-        http: getChainRPC(chain.id),
-      }),
-    }),
-  ],
-);

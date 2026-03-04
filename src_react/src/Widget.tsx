@@ -1,12 +1,8 @@
 // @ts-nocheck
-import { wagmiConfig } from './utils/wagmiConfig'
-import { WagmiConfig } from 'wagmi'
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
-import { chains } from './utils/chains'
 import ConnectWallet from "./components/ConnectWallet"
-import '@rainbow-me/rainbowkit/styles.css'
 import { useState, useEffect } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useConnect } from 'wagmi'
+import { injected } from 'wagmi/connectors'
 import { usePublicClient } from 'wagmi'
 import fetchCommon from './utils/fetchCommon'
 import toFixed from './utils/toFixed'
@@ -29,7 +25,25 @@ function Widget({ widgetOptions }) {
   } = widgetOptions
   
   const { isConnecting, isConnected, address, connector } = useAccount()
+  const { connect } = useConnect()
 
+  // Auto-connect with bridge provider when running inside MCW iframe
+  useEffect(() => {
+    const doAutoConnect = () => {
+      if (!(window as any).__bridgeActive || isConnected) return
+      connect({ connector: injected() })
+    }
+
+    if ((window as any).__bridgeActive && window.ethereum) {
+      doAutoConnect()
+    } else {
+      document.addEventListener('bridgeProviderReady', doAutoConnect, { once: true })
+    }
+
+    return () => {
+      document.removeEventListener('bridgeProviderReady', doAutoConnect)
+    }
+  }, [isConnected])
 
   const [ farmFetched, setFarmFetched ] = useState(false)
   

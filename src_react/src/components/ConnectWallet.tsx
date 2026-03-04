@@ -1,69 +1,32 @@
 import React from 'react'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount, useDisconnect } from 'wagmi'
+import { useAppKit } from '@reown/appkit/react'
+import { useAccount } from 'wagmi'
 
 
 export const ConnectWallet: React.FC = () => {
-  const { isConnecting } = useAccount()
-  const { disconnect } = useDisconnect()
+  const { open } = useAppKit()
+  const { isConnecting, isConnected, address } = useAccount()
+
+  if (isConnected && address) {
+    return (
+      <button
+        className="ff-button ff-widget-unlock-button"
+        onClick={() => open({ view: 'Account' })}
+      >
+        {address.slice(0, 6)}...{address.slice(-4)}
+      </button>
+    )
+  }
 
   return (
-    <ConnectButton.Custom>
-      {({
-        account,
-        chain,
-        openAccountModal,
-        openChainModal,
-        openConnectModal,
-        mounted,
-      }) => (
-        <div
-          {...(!mounted && {
-            'aria-hidden': true,
-            style: {
-              opacity: 0,
-              pointerEvents: 'none',
-              userSelect: 'none',
-            },
-          })}
-        >
-          {(() => {
-            if (!mounted || !account || !chain) {
-              return (
-                <button
-                  className="ff-button ff-widget-unlock-button"
-                  disabled={isConnecting}
-                  onClick={openConnectModal}
-                >
-                  Connect
-                </button>
-              );
-            }
+    <button
+      className="ff-button ff-widget-unlock-button"
+      disabled={isConnecting}
+      onClick={() => open()}
+    >
+      Connect
+    </button>
+  )
+}
 
-            if (chain.unsupported) {
-              return (
-                <button
-                  onClick={openChainModal}
-                  className="ff-button ff-widget-unlock-button"
-                >
-                  Unsupported network
-                </button>
-              );
-            }
-
-            return (
-              <button className="ff-button ff-widget-unlock-button">
-                {account.ensName
-                  ? account.ensName
-                  : account.address
-                }
-              </button>
-            );
-          })()}
-        </div>
-      )}
-    </ConnectButton.Custom>
-  );
-};
-
-export default ConnectWallet;
+export default ConnectWallet
