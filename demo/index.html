@@ -12,24 +12,47 @@
   <link rel="stylesheet" href="../reactwidget/rainbow.css">
 
   <style>
+    * { box-sizing: border-box; }
     body {
-      background: #1a1a2e;
+      background: #f5f7fa;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       margin: 0;
       padding: 40px 20px;
     }
     h1 {
-      color: #fff;
+      color: #111827;
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       margin-bottom: 8px;
+      font-weight: 700;
     }
     p.subtitle {
-      color: #aaa;
+      color: #6b7280;
       text-align: center;
-      font-size: 0.85rem;
-      margin: 0 0 40px;
+      font-size: 0.9rem;
+      margin: 0 0 16px;
     }
+    .metamask-note {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .metamask-note span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      color: #9a3412;
+    }
+    .metamask-note a {
+      color: #ea580c;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .metamask-note a:hover { text-decoration: underline; }
     .ff-farmfactory-widget {
       display: block;
       max-width: 480px;
@@ -39,8 +62,16 @@
 </head>
 <body>
 
-  <h1>FarmFactory — Static Demo</h1>
+  <h1>FarmFactory</h1>
   <p class="subtitle">Widget without WordPress. Connect wallet to interact.</p>
+
+  <div class="metamask-note">
+    <span>
+      🦊 Need a wallet?
+      <a href="https://metamask.io/download/" target="_blank" rel="noopener">Install MetaMask</a>
+      &nbsp;|&nbsp; Switch to BSC Testnet (Chain 97)
+    </span>
+  </div>
 
   <!--
     SO_FARM_FACTORY_ROOT — base URL for loading JS chunks.
@@ -60,15 +91,18 @@
       data-rewards-token-icon — URL to rewards token image (optional)
       data-staking-token-icon — URL to staking token image (optional)
 
-    BNB Testnet (chain 97) — contracts from PolyFactory:
-      RPC: https://bsc-testnet-rpc.publicnode.com
+    BNB Testnet (chain 97) — funded farm:
+      Farm:    0xd8B2EbFD5fe6d392cCd79711Ef66Bb181aE3d278 (1M FFT over 30 days)
+      Rewards: FFT (FarmFactory Token) 0xda9A5915b85028c2c0882b44dEd38A396dfEB55a
+      Staking: WEENUS 0xB9757f522B1D3B0705d3ffcaf332c2645bEDB04f
+      RPC:     https://bsc-testnet-rpc.publicnode.com
       Explorer: https://testnet.bscscan.com
   -->
   <div class="ff-farmfactory-widget"
     data-network-name="bsc_test"
-    data-farm-address="0xbE7d5C36359bB35E1dFbe4935178a9CF2107Fb44"
-    data-rewards-address="0x348236484ce96A293E210260b90bBFb228D6d1Fc"
-    data-staking-address="0x703f112Bda4Cc6cb9c5FB4B2e6140f6D8374F10b"
+    data-farm-address="0xd8B2EbFD5fe6d392cCd79711Ef66Bb181aE3d278"
+    data-rewards-address="0xda9A5915b85028c2c0882b44dEd38A396dfEB55a"
+    data-staking-address="0xB9757f522B1D3B0705d3ffcaf332c2645bEDB04f"
   ></div>
 
   <!-- React widget bundle -->
