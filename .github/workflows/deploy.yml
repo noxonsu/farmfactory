@@ -205,18 +205,25 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Create updates directory if it doesn't exist
+            PLUGIN_DIR="/home/farmFactory/web/farm.wpmix.net/public_html/wp-content/plugins/farmfactory"
+            ZIP="/home/farmFactory/incoming/farmfactory-v${{ env.VERSION }}.zip"
+
+            # Install plugin directly to WordPress plugin directory
+            rm -rf /tmp/farmfactory-extract
+            mkdir -p /tmp/farmfactory-extract
+            unzip -o "$ZIP" -d /tmp/farmfactory-extract/
+            rsync -a --delete /tmp/farmfactory-extract/farmfactory/ "$PLUGIN_DIR/"
+            chown -R www-data:www-data "$PLUGIN_DIR/" 2>/dev/null || true
+            rm -rf /tmp/farmfactory-extract
+            echo "✓ Plugin installed to WordPress: $PLUGIN_DIR"
+
+            # Copy ZIP to updates directory
             mkdir -p /home/farmFactory/web/farm.wpmix.net/public_html/updates
-
-            # Move ZIP file from incoming to updates
-            mv /home/farmFactory/incoming/farmfactory-v${{ env.VERSION }}.zip \
-               /home/farmFactory/web/farm.wpmix.net/public_html/updates/
-
-            # Set permissions
+            cp "$ZIP" /home/farmFactory/web/farm.wpmix.net/public_html/updates/
             chmod 644 /home/farmFactory/web/farm.wpmix.net/public_html/updates/farmfactory-v${{ env.VERSION }}.zip
+            rm -f "$ZIP"
 
-            echo "WordPress plugin package deployed:"
-            ls -lh /home/farmFactory/web/farm.wpmix.net/public_html/updates/farmfactory-v${{ env.VERSION }}.zip
+            echo "✓ ZIP available at updates/farmfactory-v${{ env.VERSION }}.zip"
 
       - name: Deploy static demo (if exists)
         uses: appleboy/ssh-action@master
