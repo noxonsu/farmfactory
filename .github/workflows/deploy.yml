@@ -259,8 +259,13 @@ jobs:
       - name: Assemble GitHub Pages demo
         run: |
           mkdir -p _gh_pages
+          # Root index.html (with wallet header, paths relative to root)
+          cp index.html _gh_pages/index.html
+          # demo/ subdir (paths relative to demo/, use ../reactwidget/ etc.)
           cp -r demo/ _gh_pages/
+          # reactwidget/ and wordpress/ (referenced by root index.html)
           cp -r reactwidget/ _gh_pages/
+          cp -r wordpress/ _gh_pages/
           touch _gh_pages/.nojekyll
 
       - name: Deploy demo to appsource/farm

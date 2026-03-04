@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmFactory — Yield Farming Widget Demo</title>
+  <meta name="description" content="FarmFactory — embed yield farming widget on any website. BSC Testnet demo.">
+
+  <!-- FarmFactory widget styles -->
+  <link rel="stylesheet" href="wordpress/assets/css/farmfactory.css">
+  <!-- AppKit / WalletConnect styles -->
+  <link rel="stylesheet" href="reactwidget/rainbow.css">
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #f5f7fa;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .wallet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .wallet-header-logo {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #111827;
+      letter-spacing: -0.01em;
+    }
+    .page-content {
+      padding: 40px 20px;
+    }
+    .page-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .page-header h1 {
+      color: #111827;
+      font-size: 1.8rem;
+      margin: 0 0 8px;
+      font-weight: 700;
+    }
+    .page-header p {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin: 0 0 16px;
+    }
+    .metamask-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      color: #9a3412;
+    }
+    .metamask-note a {
+      color: #ea580c;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .metamask-note a:hover { text-decoration: underline; }
+    .ff-farmfactory-widget {
+      display: block;
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+    .network-badge {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .network-badge span {
+      display: inline-block;
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    .page-footer {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.8rem;
+      margin-top: 40px;
+    }
+    .page-footer a { color: #6b7280; text-decoration: none; }
+    .page-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- Wallet header — appkit-button is registered by main.js (Reown AppKit) -->
+  <header class="wallet-header">
+    <span class="wallet-header-logo">FarmFactory</span>
+    <appkit-button></appkit-button>
+  </header>
+
+  <div class="page-content">
+
+  <div class="page-header">
+    <h1>FarmFactory</h1>
+    <p>Yield Farming Widget — embed on any website in minutes.</p>
+    <div class="metamask-note">
+      🦊 Need a wallet?
+      <a href="https://metamask.io/download/" target="_blank" rel="noopener">Install MetaMask</a>
+      &nbsp;|&nbsp; Use BSC Testnet (Chain 97)
+    </div>
+  </div>
+
+  <div class="network-badge">
+    <span>⚡ BSC Testnet — Live Demo</span>
+  </div>
+
+  <!--
+    SO_FARM_FACTORY_ROOT — base URL for JS chunk loading.
+    Auto-detected from current page directory.
+  -->
+  <script>
+    window.SO_FARM_FACTORY_ROOT = new URL('.', window.location.href).href.replace(/\/$/, '');
+  </script>
+
+  <!--
+    Widget attributes:
+      data-network-name     — "bsc" | "bsc_test" | "mainnet" | "matic" | ...
+      data-farm-address     — StakingRewards contract
+      data-rewards-address  — ERC20 token users EARN
+      data-staking-address  — ERC20 token users DEPOSIT
+
+    BSC Testnet (chain 97) — Active farm:
+      Farm:    0xd8B2EbFD5fe6d392cCd79711Ef66Bb181aE3d278
+      Rewards: FFT (FarmFactory Token) — 1M FFT over 30 days
+      Staking: WEENUS
+      RPC:     https://bsc-testnet-rpc.publicnode.com
+      Explorer: https://testnet.bscscan.com
+  -->
+  <div class="ff-farmfactory-widget"
+    data-network-name="bsc_test"
+    data-farm-address="0xd8B2EbFD5fe6d392cCd79711Ef66Bb181aE3d278"
+    data-rewards-address="0xda9A5915b85028c2c0882b44dEd38A396dfEB55a"
+    data-staking-address="0xB9757f522B1D3B0705d3ffcaf332c2645bEDB04f"
+  ></div>
+
+  <!-- React widget bundle -->
+  <script defer src="reactwidget/static/js/main.js"></script>
+
+  <div class="page-footer">
+    <a href="https://onout.org/farming/" target="_blank">FarmFactory</a> —
+    Embed yield farming on your site.
+    &nbsp;|&nbsp;
+    <a href="https://github.com/appsource/farm" target="_blank">GitHub</a>
+    &nbsp;|&nbsp;
+    <a href="https://testnet.bscscan.com/address/0xd8B2EbFD5fe6d392cCd79711Ef66Bb181aE3d278" target="_blank">Contract on BSCScan</a>
+  </div>
+
+  </div><!-- .page-content -->
+</body>
+</html>
