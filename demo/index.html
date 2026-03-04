@@ -44,11 +44,11 @@
 
   <!--
     SO_FARM_FACTORY_ROOT — base URL for loading JS chunks.
-    Must point to the directory containing /reactwidget/
-    Change to your domain if self-hosting.
+    Auto-detected from current page URL (one level up from /demo/).
+    Override only if chunks are hosted on a different domain.
   -->
   <script>
-    window.SO_FARM_FACTORY_ROOT = "https://noxonsu.github.io/farmfactory";
+    window.SO_FARM_FACTORY_ROOT = new URL('..', window.location.href).href.replace(/\/$/, '');
   </script>
 
   <!--
