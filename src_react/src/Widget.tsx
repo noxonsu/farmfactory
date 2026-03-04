@@ -548,9 +548,7 @@ function Widget({ widgetOptions }) {
         )}
 
         <div className="ff-widget-footer">
-          {!isConnected && (
-            <ConnectWallet />
-          )}
+          <ConnectWallet />
           
           <button className="ff-button ff-widget-approve-button ff-hidden" type="button">Approve contract</button>
         </div>
