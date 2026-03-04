@@ -173,7 +173,11 @@ const NETWORKS = {
 }
 
 export const GET_RPC = (chainName) => {
-  return NETWORKS[chainName].rpc
+  const network = NETWORKS[chainName]
+  if (!network) {
+    throw new Error(`FarmFactory: unknown network "${chainName}". Valid values: ${Object.keys(NETWORKS).join(', ')}`)
+  }
+  return network.rpc
 }
 
 export const GET_TX_LINK = (hash) => {
