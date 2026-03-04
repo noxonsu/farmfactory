@@ -35,7 +35,7 @@ const NETWORKS = {
       symbol: "BNB",
       decimals: 18
     },
-    rpc: "https://bscrpc.com/",
+    rpc: "https://bsc-rpc.publicnode.com",
     explorer: "https://bscscan.com",
   },
   bsc_test: {
