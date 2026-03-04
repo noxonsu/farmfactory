@@ -24,7 +24,9 @@
     "dev": "rollup -cw",
     "build:farmdeploy": "node ./bin/solc.js",
     "build:farmfactory": "rollup -c",
-    "build": "rimraf ./lib && (npm run build:farmdeploy || echo 'Warning: Contract compilation skipped') && npm run build:farmfactory"
+    "build": "rimraf ./lib && (npm run build:farmdeploy || echo 'Warning: Contract compilation skipped') && npm run build:farmfactory",
+    "check-rpc": "node scripts/check-rpc.js",
+    "prepare": "node -e \"try{require('fs').mkdirSync('.husky',{recursive:true})}catch(e){}\" && git config core.hooksPath .husky 2>/dev/null || true"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.7",

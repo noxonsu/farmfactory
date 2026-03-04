@@ -1,0 +1,6 @@
+#!/bin/sh
+# FarmFactory pre-commit hook — RPC health check
+# Blocks commit if CRITICAL RPC endpoints are down.
+# Non-critical failures print a warning but allow commit.
+
+node scripts/check-rpc.js

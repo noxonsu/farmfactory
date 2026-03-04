@@ -5,17 +5,6 @@
 const FARM_CHAIN = window.SO_FARM_FACTORY_NETWORK
 
 const NETWORKS = {
-  goerli: {
-    chainId: 5,
-    name: "Goerli",
-    nativeCurrency: {
-      name: "Goerli Ether",
-      symbol: "ETH",
-      decimals: 18
-    },
-    rpc: "https://eth-goerli.g.alchemy.com/v2/wNvkA78LYEG7fb5S5z4nJIfB22dAcvuH",
-    explorer: "https://goerli.etherscan.io",
-  },
   mainnet: {
     chainId: 1,
     name: "Ethereum",
@@ -24,7 +13,7 @@ const NETWORKS = {
       symbol: "ETH",
       decimals: 18
     },
-    rpc: "https://mainnet.infura.io/v3/7213b5d53a4943b7af08a9cfce1cf2e2",
+    rpc: "https://ethereum-rpc.publicnode.com",
     explorer: "https://etherscan.io",
   },
   bsc: {
@@ -40,13 +29,13 @@ const NETWORKS = {
   },
   bsc_test: {
     chainId: 97,
-    name: "BSC testnet",
+    name: "BNB Smart Chain Testnet",
     nativeCurrency: {
       name: "BNB",
       symbol: "BNB",
       decimals: 18
     },
-    rpc: "https://data-seed-prebsc-1-s2.binance.org:8545",
+    rpc: "https://bsc-testnet-rpc.publicnode.com",
     explorer: "https://testnet.bscscan.com",
   },
   matic: {
@@ -57,19 +46,8 @@ const NETWORKS = {
       symbol: "MATIC",
       decimals: 18
     },
-    rpc: "https://polygon-rpc.com/",
+    rpc: "https://polygon-bor-rpc.publicnode.com",
     explorer: "https://polygonscan.com/",
-  },
-  mumbai: {
-    chainId: 80001,
-    name: "Polygon testnet",
-    nativeCurrency: {
-      name: "MATIC",
-      symbol: "MATIC",
-      decimals: 18
-    },
-    rpc: "https://endpoints.omniatech.io/v1/matic/mumbai/public",
-    explorer: "https://mumbai.polygonscan.com/",
   },
   cronos: {
     chainId: 25,
@@ -189,7 +167,7 @@ const NETWORKS = {
       symbol: "ETH",
       decimals: 18
     },
-    rpc: "https://sepolia.infura.io/v3/7213b5d53a4943b7af08a9cfce1cf2e2",
+    rpc: "https://ethereum-sepolia-rpc.publicnode.com",
     explorer: "https://sepolia.etherscan.io/",
   },
 }

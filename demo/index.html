@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmFactory — Static Demo</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- FarmFactory widget styles -->
+  <link rel="stylesheet" href="../wordpress/assets/css/farmfactory.css">
+  <!-- AppKit / WalletConnect styles -->
+  <link rel="stylesheet" href="../reactwidget/rainbow.css">
+
+  <style>
+    body {
+      background: #1a1a2e;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    h1 {
+      color: #fff;
+      text-align: center;
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      color: #aaa;
+      text-align: center;
+      font-size: 0.85rem;
+      margin: 0 0 40px;
+    }
+    .ff-farmfactory-widget {
+      display: block;
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>FarmFactory — Static Demo</h1>
+  <p class="subtitle">Widget without WordPress. Connect wallet to interact.</p>
+
+  <!--
+    SO_FARM_FACTORY_ROOT — base URL for loading JS chunks.
+    Must point to the directory containing /reactwidget/
+    Change to your domain if self-hosting.
+  -->
+  <script>
+    window.SO_FARM_FACTORY_ROOT = "https://noxonsu.github.io/farmfactory";
+  </script>
+
+  <!--
+    Widget div attributes:
+      data-network-name     — network key from chains.ts: "bsc" | "bsc_test" | "mainnet" | "matic" | ...
+      data-farm-address     — deployed StakingRewards contract address
+      data-rewards-address  — ERC20 token users EARN
+      data-staking-address  — ERC20 token users DEPOSIT
+      data-rewards-token-icon — URL to rewards token image (optional)
+      data-staking-token-icon — URL to staking token image (optional)
+
+    BNB Testnet (chain 97) — contracts from PolyFactory:
+      RPC: https://bsc-testnet-rpc.publicnode.com
+      Explorer: https://testnet.bscscan.com
+  -->
+  <div class="ff-farmfactory-widget"
+    data-network-name="bsc_test"
+    data-farm-address="0xbE7d5C36359bB35E1dFbe4935178a9CF2107Fb44"
+    data-rewards-address="0x348236484ce96A293E210260b90bBFb228D6d1Fc"
+    data-staking-address="0x703f112Bda4Cc6cb9c5FB4B2e6140f6D8374F10b"
+  ></div>
+
+  <!-- React widget bundle -->
+  <script defer src="../reactwidget/static/js/main.js"></script>
+
+</body>
+</html>
