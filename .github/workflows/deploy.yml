@@ -65,33 +65,37 @@ jobs:
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
           VERSION="${{ env.VERSION }}"
 
-          # Use Python to build JSON safely (handles all special characters, quotes, newlines)
-          python3 -c "
-import json, sys
-msg = sys.argv[1]
-ver = sys.argv[2]
-ts = sys.argv[3]
-data = {
-    'name': 'Farm Factory',
-    'version': ver,
-    'tested': '6.4',
-    'requires': '5.0',
-    'requires_php': '7.1',
-    'download_url': 'https://farm.wpmix.net/updates/farmfactory-v' + ver + '.zip',
-    'last_updated': ts,
-    'sections': {
-        'description': 'Stake farming contract - allows users to stake tokens and earn rewards on Ethereum, BSC, and Polygon networks',
-        'installation': 'Upload the plugin files to /wp-content/plugins/farmfactory/, then activate the plugin through the Plugins menu in WordPress',
-        'changelog': '<h4>' + ver + '</h4><ul><li>' + msg + '</li></ul>',
-    },
-}
-print(json.dumps(data, indent=2, ensure_ascii=False))
-" "$COMMIT_MSG" "$VERSION" "$TIMESTAMP" > info.json
+          # Use jq to build JSON safely (handles all special characters in commit messages)
+          jq -n \
+            --arg name "Farm Factory" \
+            --arg version "$VERSION" \
+            --arg tested "6.4" \
+            --arg requires "5.0" \
+            --arg requires_php "7.1" \
+            --arg download_url "https://farm.wpmix.net/updates/farmfactory-v${VERSION}.zip" \
+            --arg last_updated "$TIMESTAMP" \
+            --arg description "Stake farming contract - allows users to stake tokens and earn rewards on Ethereum, BSC, and Polygon networks" \
+            --arg installation "Upload the plugin files to /wp-content/plugins/farmfactory/, then activate the plugin through the Plugins menu in WordPress" \
+            --arg changelog "<h4>${VERSION}</h4><ul><li>${COMMIT_MSG}</li></ul>" \
+            '{
+              name: $name,
+              version: $version,
+              tested: $tested,
+              requires: $requires,
+              requires_php: $requires_php,
+              download_url: $download_url,
+              last_updated: $last_updated,
+              sections: {
+                description: $description,
+                installation: $installation,
+                changelog: $changelog
+              }
+            }' > info.json
 
           echo "Generated info.json:"
-          cat info.json | jq .
+          cat info.json
           echo "Validating JSON..."
-          cat info.json | jq . > /dev/null && echo "Valid JSON" || (echo "Invalid JSON" && exit 1)
+          jq . info.json > /dev/null && echo "Valid JSON" || (echo "Invalid JSON" && exit 1)
 
       - name: Create WordPress plugin package
         run: |
