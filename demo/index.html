@@ -17,6 +17,26 @@
       background: #f5f7fa;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       margin: 0;
+      padding: 0;
+    }
+    .wallet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .wallet-header-logo {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #111827;
+      letter-spacing: -0.01em;
+    }
+    .page-content {
       padding: 40px 20px;
     }
     h1 {
@@ -61,6 +81,14 @@
   </style>
 </head>
 <body>
+
+  <!-- Wallet header — appkit-button is registered by main.js (Reown AppKit) -->
+  <header class="wallet-header">
+    <span class="wallet-header-logo">FarmFactory</span>
+    <appkit-button></appkit-button>
+  </header>
+
+  <div class="page-content">
 
   <h1>FarmFactory</h1>
   <p class="subtitle">Widget without WordPress. Connect wallet to interact.</p>
@@ -108,5 +136,6 @@
   <!-- React widget bundle -->
   <script defer src="../reactwidget/static/js/main.js"></script>
 
+  </div><!-- .page-content -->
 </body>
 </html>
