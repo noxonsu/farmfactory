@@ -248,6 +248,24 @@ jobs:
             echo "⚠ Warning: Health check returned HTTP $HTTP_CODE (non-blocking)"
           fi
 
+
+      - name: Assemble GitHub Pages demo
+        run: |
+          mkdir -p _gh_pages
+          cp -r demo/ _gh_pages/
+          cp -r reactwidget/ _gh_pages/
+          touch _gh_pages/.nojekyll
+
+      - name: Deploy demo to appsource/farm
+        uses: peaceiris/actions-gh-pages@v3
+        continue-on-error: true
+        with:
+          personal_token: ${{ secrets.APPSOURCE_TOKEN }}
+          external_repository: appsource/farm
+          publish_branch: gh-pages
+          publish_dir: ./_gh_pages
+          force_orphan: true
+
       - name: Notify completion
         if: success()
         run: |
