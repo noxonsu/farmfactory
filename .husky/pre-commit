@@ -1,6 +1,11 @@
 #!/bin/sh
-# FarmFactory pre-commit hook — RPC health check
-# Blocks commit if CRITICAL RPC endpoints are down.
-# Non-critical failures print a warning but allow commit.
+# FarmFactory pre-commit hook
 
+# 1. Check SKILL.md exists
+if [ ! -f SKILL.md ]; then
+  echo "❌ SKILL.md not found! Create SKILL.md documenting how agents manage this product."
+  exit 1
+fi
+
+# 2. RPC health check — blocks commit if CRITICAL endpoints are down
 node scripts/check-rpc.js
