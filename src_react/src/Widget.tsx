@@ -25,16 +25,21 @@ function Widget({ widgetOptions }) {
   } = widgetOptions
   
   const { isConnecting, isConnected, address, connector } = useAccount()
-  const { connect } = useConnect()
+  const { connectAsync } = useConnect()
 
   // Auto-connect with bridge provider when running inside MCW iframe
   useEffect(() => {
     if (!(window as any).__bridgeActive || isConnected) return
 
-    const doAutoConnect = () => {
+    const doAutoConnect = async () => {
       if (isConnected) return
       console.log('[FarmFactory Bridge] Auto-connecting via injected connector...')
-      connect({ connector: injected() })
+      try {
+        await connectAsync({ connector: injected() })
+        console.log('[FarmFactory Bridge] Connected successfully')
+      } catch (err) {
+        console.error('[FarmFactory Bridge] Auto-connect failed:', err)
+      }
     }
 
     // bridgeProviderReady fires AFTER handshake (accounts available)
