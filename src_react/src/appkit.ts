@@ -12,6 +12,8 @@ const searchParams = new URLSearchParams(window.location.search)
 const urlTheme = searchParams.get('theme')
 const themeMode: 'light' | 'dark' = urlTheme === 'dark' ? 'dark' : 'light'
 
+export const isBridgeMode = typeof window !== 'undefined' && !!(window as any).__bridgeActive
+
 export const wagmiAdapter = new WagmiAdapter({
   networks,
   projectId,
@@ -38,7 +40,11 @@ export const modal = createAppKit({
   },
   themeMode,
   features: { analytics: false },
+  allowUnsupportedChain: true,
 })
 
-reconnect(wagmiConfig)
+if (!isBridgeMode) {
+  reconnect(wagmiConfig)
+}
+
 export default modal
