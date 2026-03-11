@@ -261,6 +261,8 @@ jobs:
           mkdir -p _gh_pages
           # Root index.html (with wallet header, paths relative to root)
           cp index.html _gh_pages/index.html
+          # Wallet bridge init (MCW iframe auto-connect)
+          cp src_react/public/wallet-bridge-init.js _gh_pages/wallet-bridge-init.js
           # demo/ subdir (paths relative to demo/, use ../reactwidget/ etc.)
           cp -r demo/ _gh_pages/
           # reactwidget/ and wordpress/ (referenced by root index.html)
