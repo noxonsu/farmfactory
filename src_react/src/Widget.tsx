@@ -200,6 +200,7 @@ function Widget({ widgetOptions }) {
   
   const [ isDepositOpened, setIsDepositOpened ] = useState(false)
   const [ depositAmount, setDepositAmount ] = useState('')
+  const [ useMaxDeposit, setUseMaxDeposit ] = useState(false)
   const [ isDepositing, setIsDepositing ] = useState(false)
   const [ isDepositReady, setIsDepositReady ] = useState(false)
   const [ isDepositError, setIsDepositError ] = useState(false)
@@ -208,6 +209,7 @@ function Widget({ widgetOptions }) {
   useEffect(() => {
     if (isDepositOpened) {
       setDepositAmount('')
+      setUseMaxDeposit(false)
       setDepositHash(false)
       setIsDepositReady(false)
       setIsDepositError(false)
@@ -225,7 +227,7 @@ function Widget({ widgetOptions }) {
     } catch (err) {}
 
     if (amount > 0) {
-      const value = (depositAmount == userBalance) ? userBalanceWei : formatAmount(depositAmount, stakingDecimals)
+      const value = useMaxDeposit ? userBalanceWei : formatAmount(depositAmount, stakingDecimals)
       if (new BigNumber(value).isGreaterThan(allowanceAmount)) {
         console.log('>>> need approve')
         setNeedApprove(true)
@@ -235,7 +237,7 @@ function Widget({ widgetOptions }) {
     } else {
       setNeedApprove(false)
     }
-  }, [ depositAmount, allowanceAmount ])
+  }, [ depositAmount, allowanceAmount, useMaxDeposit ])
   
   const doApprove = () => {
     let amount = 0
@@ -244,11 +246,10 @@ function Widget({ widgetOptions }) {
     } catch (err) {}
 
     if (amount > 0) {
-      const value = (depositAmount == userBalance) ? userBalanceWei : formatAmount(depositAmount, stakingDecimals)
-      const approveValue = new BigNumber(value).minus(allowanceAmount).toString()
+      const value = useMaxDeposit ? userBalanceWei : formatAmount(depositAmount, stakingDecimals)
       setIsApproving(true)
       connector.getProvider().then((provider) => {
-        callApproveContract({
+        const runApprove = () => callApproveContract({
           provider,
           contractAddress: stakingAddress,
           method: 'approve',
@@ -273,6 +274,26 @@ function Widget({ widgetOptions }) {
           console.log('>>> ERROR', err)
           setIsApproving(false)
         })
+
+        if (new BigNumber(allowanceAmount).isGreaterThan(0)) {
+          // Zero-reset first for USDT-like tokens that do not allow non-zero to non-zero approve
+          callApproveContract({
+            provider,
+            contractAddress: stakingAddress,
+            method: 'approve',
+            args: [ farmAddress, '0' ],
+            weiAmount: false,
+            onTrx: () => {},
+            onError: () => {},
+            onFinally: () => {}
+          }).then(() => {
+            runApprove()
+          }).catch(() => {
+            runApprove()
+          })
+        } else {
+          runApprove()
+        }
       }).catch((err) => {
         setIsApproving(false)
         console.log('Fail get provider', err)
@@ -288,9 +309,9 @@ function Widget({ widgetOptions }) {
 
     if (amount > 0) {
       setIsDepositing(true)
-        
-      const value = (depositAmount == userBalance) ? userBalanceWei : formatAmount(depositAmount, stakingDecimals)
-      
+
+      const value = useMaxDeposit ? userBalanceWei : formatAmount(depositAmount, stakingDecimals)
+
       connector.getProvider().then((provider) => {
         callFarmContract({
           provider,
@@ -329,14 +350,16 @@ function Widget({ widgetOptions }) {
   
   const [ isWithdrawOpened, setIsWithdrawOpened ] = useState(false)
   const [ withdrawAmount, setWithdrawAmount ] = useState('')
+  const [ useMaxWithdraw, setUseMaxWithdraw ] = useState(false)
   const [ isWithdrawing, setIsWithdrawing ] = useState(false)
   const [ isWithdrawReady, setIsWithdrawReady ] = useState(false)
   const [ isWithdrawError, setIsWithdrawError ] = useState(false)
   const [ withdrawHash, setWithdrawHash ] = useState(false)
-  
+
   useEffect(() => {
     if (isWithdrawOpened) {
       setWithdrawAmount('')
+      setUseMaxWithdraw(false)
       setWithdrawHash(false)
       setIsWithdrawReady(false)
       setIsWithdrawError(false)
@@ -351,7 +374,7 @@ function Widget({ widgetOptions }) {
     if (amount > 0) {
       setIsWithdrawing(true)
         
-      const value = (withdrawAmount == stakedAmount) ? stakedAmountWei : formatAmount(withdrawAmount, stakingDecimals)
+      const value = useMaxWithdraw ? stakedAmountWei : formatAmount(withdrawAmount, stakingDecimals)
       
       connector.getProvider().then((provider) => {
         callFarmContract({
@@ -596,7 +619,7 @@ function Widget({ widgetOptions }) {
                         {stakedAmount > 0 && (
                           <>
                             {` `}
-                            <a className="ff-max-balance-button" onClick={() => { if (!isWithdrawing) setWithdrawAmount(stakedAmount) }}>
+                            <a className="ff-max-balance-button" onClick={() => { if (!isWithdrawing) { setWithdrawAmount(stakedAmount); setUseMaxWithdraw(true) } }}>
                               <b>{`use max`}</b>
                             </a>
                           </>
@@ -608,7 +631,7 @@ function Widget({ widgetOptions }) {
                         placeholder="0.0"
                         value={withdrawAmount}
                         disabled={isWithdrawing}
-                        onChange={(e) => { setWithdrawAmount(e.target.value) }}
+                        onChange={(e) => { setWithdrawAmount(e.target.value); setUseMaxWithdraw(false) }}
                       />
                     </div>
                     {withdrawHash && (
@@ -654,7 +677,7 @@ function Widget({ widgetOptions }) {
                         {userBalance > 0 && (
                           <>
                             {` `}
-                            <a className="ff-max-balance-button" onClick={() => { if (!isApproving && !isDepositing) setDepositAmount(userBalance) }}>
+                            <a className="ff-max-balance-button" onClick={() => { if (!isApproving && !isDepositing) { setDepositAmount(userBalance); setUseMaxDeposit(true) } }}>
                               <b>{`use max`}</b>
                             </a>
                           </>
@@ -666,7 +689,7 @@ function Widget({ widgetOptions }) {
                         placeholder="0.0"
                         value={depositAmount}
                         disabled={isApproving || isDepositing}
-                        onChange={(e) => { setDepositAmount(e.target.value) }}
+                        onChange={(e) => { setDepositAmount(e.target.value); setUseMaxDeposit(false) }}
                       />
                     </div>
                     {depositHash && (

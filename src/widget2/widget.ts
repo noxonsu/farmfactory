@@ -305,9 +305,21 @@ class Widget {
       const { web3, account } = getState()
 
       const spender = opts.farmAddress
-      const value = web3.utils.toBN('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+
+      if (!web3.utils.isAddress(spender)) {
+        infoModal.open('Invalid farm address')
+        return
+      }
 
       try {
+        const userBalance = await this.contracts.staking.methods.balanceOf(account).call()
+        const value = web3.utils.toBN(userBalance)
+
+        const currentAllowance = await this.contracts.staking.methods.allowance(account, spender).call()
+        if (web3.utils.toBN(currentAllowance).gt(web3.utils.toBN('0'))) {
+          await this.contracts.staking.methods.approve(spender, web3.utils.toBN('0')).send({ from: account })
+        }
+
         await this.contracts.staking.methods.approve(spender, value).send({ from: account })
         this.handleApproved()
       }
