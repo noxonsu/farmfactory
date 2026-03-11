@@ -307,7 +307,7 @@ class Widget {
       const spender = opts.farmAddress
 
       if (!web3.utils.isAddress(spender)) {
-        infoModal.open('Invalid farm address')
+        infoModal.open({ message: 'Invalid farm address' })
         return
       }
 
@@ -325,7 +325,7 @@ class Widget {
       }
       catch (err) {
         console.error(err)
-        infoModal.open(err.message)
+        infoModal.open({ message: err.message })
       }
     })
   }
