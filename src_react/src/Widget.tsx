@@ -29,12 +29,16 @@ function Widget({ widgetOptions }) {
 
   // Auto-connect with bridge provider when running inside MCW iframe
   useEffect(() => {
+    if (!(window as any).__bridgeActive || isConnected) return
+
     const doAutoConnect = () => {
-      if (!(window as any).__bridgeActive || isConnected) return
+      if (isConnected) return
+      console.log('[FarmFactory Bridge] Auto-connecting via injected connector...')
       connect({ connector: injected() })
     }
 
-    if ((window as any).__bridgeActive && window.ethereum) {
+    // bridgeProviderReady fires AFTER handshake (accounts available)
+    if (window.ethereum?.isSwapWalletAppsBridge && window.ethereum?.selectedAddress) {
       doAutoConnect()
     } else {
       document.addEventListener('bridgeProviderReady', doAutoConnect, { once: true })

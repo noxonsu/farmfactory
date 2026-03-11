@@ -26,7 +26,13 @@
       return;
     }
 
-    // Notify app when accounts change (connect / disconnect / switch)
+    // Wait for bridge handshake (READY with accounts) before notifying React
+    window.ethereum.on('bridgeReady', function (payload) {
+      console.log('[FarmFactory Bridge] Handshake complete, accounts:', payload.accounts);
+      document.dispatchEvent(new CustomEvent('bridgeProviderReady'));
+    });
+
+    // Also handle accountsChanged for subsequent changes
     window.ethereum.on('accountsChanged', function (accounts) {
       document.dispatchEvent(new CustomEvent('wcAccountChanged', {
         detail: {
@@ -36,18 +42,13 @@
       }));
     });
 
-    // Race-condition fix: fire immediately if already connected
-    var preloaded = window.ethereum.selectedAddress;
-    if (preloaded) {
-      document.dispatchEvent(new CustomEvent('wcAccountChanged', {
-        detail: { address: preloaded, isConnected: true },
-      }));
+    // Race-condition fix: READY may have arrived before this listener registered
+    if (window.ethereum.selectedAddress) {
+      console.log('[FarmFactory Bridge] Already connected:', window.ethereum.selectedAddress);
+      document.dispatchEvent(new CustomEvent('bridgeProviderReady'));
     }
 
-    // Notify wagmi to reconnect with injected connector
-    document.dispatchEvent(new CustomEvent('bridgeProviderReady'));
-
-    console.log('[FarmFactory Bridge] Bridge client ready, waiting for wallet handshake...');
+    console.log('[FarmFactory Bridge] Listeners registered, waiting for handshake...');
   }
 
   var script = document.createElement('script');
